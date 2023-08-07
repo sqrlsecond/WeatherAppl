@@ -6,8 +6,20 @@ import ru.makarovda.weatherappl.domain.WeatherData;
 
 public class WeatherResponse {
 
-    public class Current {
+    public class Location
+    {
 
+        @SerializedName("name")
+        private String name_;
+
+        public Location(String name)
+        {
+            name_ = name;
+        }
+    }
+
+    public class Current
+    {
         private class Condition
         {
             @SerializedName("text")
@@ -52,6 +64,9 @@ public class WeatherResponse {
     @SerializedName("current")
     private Current current_;
 
+    @SerializedName("location")
+    private Location location_;
+
     public WeatherResponse(Current current)
     {
         current_ = current;
@@ -63,7 +78,8 @@ public class WeatherResponse {
                 current_.temperature_,
                 current_.feelsLikeTemperature_,
                 current_.windSpeed_,
-                current_.condition_.text_
+                current_.condition_.text_,
+                location_.name_
         );
     }
 

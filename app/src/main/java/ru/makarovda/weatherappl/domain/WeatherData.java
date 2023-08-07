@@ -14,12 +14,20 @@ public class WeatherData {
     // Состояние (ясно, дождь и т.д.)
     private String condition_;
 
-    public WeatherData(float temperature, float feelsLikeTemperature, float windSpeed, String condition)
+    // Название города
+    private String city_;
+
+    public WeatherData( float temperature,
+                        float feelsLikeTemperature,
+                        float windSpeed,
+                        String condition,
+                        String cityName)
     {
         temperature_ = temperature;
         feelsLikeTemperature_ = feelsLikeTemperature;
         windSpeed_ = windSpeed;
         condition_ = condition;
+        city_ = cityName;
     }
 
     public float getTemperature()
@@ -40,6 +48,11 @@ public class WeatherData {
     public String getCondition()
     {
         return condition_;
+    }
+
+    public String getCity()
+    {
+        return city_;
     }
 
 }

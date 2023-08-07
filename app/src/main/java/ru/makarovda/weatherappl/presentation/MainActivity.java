@@ -9,13 +9,17 @@ import io.reactivex.Observer;
 import io.reactivex.Scheduler;
 import io.reactivex.SingleObserver;
 import io.reactivex.disposables.Disposable;
+import io.reactivex.observers.DisposableObserver;
 import io.reactivex.schedulers.Schedulers;
 import retrofit2.Retrofit;
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
 import retrofit2.converter.gson.GsonConverterFactory;
 import ru.makarovda.weatherappl.R;
+import ru.makarovda.weatherappl.WeatherApplication;
 import ru.makarovda.weatherappl.data.network.IWeatherService;
 import ru.makarovda.weatherappl.data.network.WeatherResponse;
+import ru.makarovda.weatherappl.domain.IRepository;
+import ru.makarovda.weatherappl.domain.WeatherData;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -24,32 +28,34 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl("https://api.weatherapi.com/v1/")
-                .addConverterFactory(GsonConverterFactory.create())
-                .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
-                .build();
+        WeatherApplication app = (WeatherApplication)getApplication();
+        IRepository repository = app.getAppComponent().getRepository();
 
-        IWeatherService weather = retrofit.create(IWeatherService.class);
-
-        weather.getCurrentWeather("London").subscribeOn(Schedulers.io()).subscribe(
-                new SingleObserver<WeatherResponse>() {
+        repository.getWeatherFlowable().subscribeOn(Schedulers.io()).subscribe(
+                new Observer<WeatherData>() {
                     @Override
                     public void onSubscribe(Disposable d) {
 
                     }
 
                     @Override
-                    public void onSuccess(WeatherResponse value) {
-                        Log.d("WethRes", value.toWeatherDomain().getCondition());
+                    public void onNext(WeatherData value) {
+                        Log.d("WeatResp", value.getCondition().toString());
                     }
 
                     @Override
                     public void onError(Throwable e) {
-                        Log.d("WethRes", e.toString());
+
+                    }
+
+                    @Override
+                    public void onComplete() {
+
                     }
                 }
         );
+
+        repository.requestWeather("London");
 
 
     }
