@@ -1,6 +1,7 @@
 package ru.makarovda.weatherappl.presentation;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.lifecycle.ViewModelProvider;
 
 import android.content.res.Resources;
 import android.os.Bundle;
@@ -22,37 +23,48 @@ import ru.makarovda.weatherappl.domain.WeatherData;
 
 public class MainActivity extends AppCompatActivity {
 
+    private TextView temperatureTV;
+    private TextView feelsLikeTempTV;
+    private TextView conditionTV;
+    private TextView windSpeedTV;
+    private EditText cityNameET;
+    private Disposable disposable_;
+
+    private MainViewModel mainVM_;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        WeatherApplication app = (WeatherApplication)getApplication();
-        IRepository repository = app.getAppComponent().getRepository();
-        TextView temperatureTV = findViewById(R.id.temperature_textView);
-        TextView feelsLikeTempTV = findViewById(R.id.feelsLike_textView);
-        TextView conditionTV = findViewById(R.id.condition_textView);
-        TextView windSpeedTV = findViewById(R.id.windSpeed_textView);
-        EditText cityNameET = findViewById(R.id.city_name_editText);
+        mainVM_ = new ViewModelProvider(this).get(MainViewModel.class);
+
+        temperatureTV = findViewById(R.id.temperature_textView);
+        feelsLikeTempTV = findViewById(R.id.feelsLike_textView);
+        conditionTV = findViewById(R.id.condition_textView);
+        windSpeedTV = findViewById(R.id.windSpeed_textView);
+        cityNameET = findViewById(R.id.city_name_editText);
         cityNameET.setOnKeyListener(
-                new View.OnKeyListener() {
-                    @Override
-                    public boolean onKey(View v, int keyCode, KeyEvent event) {
-                        if(keyCode == KeyEvent.KEYCODE_ENTER) {
-                            repository.requestWeather(((EditText)v).getText().toString());
-                            return true;
-                        }
-                        return false;
+                (v, keyCode, event) -> {
+                    if((keyCode == KeyEvent.KEYCODE_ENTER) && (event.getAction() == KeyEvent.ACTION_UP)) {
+                        mainVM_.requestWeather(((EditText)v).getText().toString());
+                        return true;
                     }
+                    return false;
                 }
         );
+    }
+
+    @Override
+    protected void onStart()
+    {
+
         Resources res = getResources();
 
-        repository.getWeatherFlowable().subscribeOn(Schedulers.io()).subscribe(
+        mainVM_.getWeatherFlowable().subscribe(
                 new Observer<WeatherData>() {
                     @Override
                     public void onSubscribe(Disposable d) {
-
+                        disposable_ = d;
                     }
 
                     @Override
@@ -76,9 +88,15 @@ public class MainActivity extends AppCompatActivity {
                     }
                 }
         );
-
-        repository.readWeather();
-
+        super.onStart();
 
     }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        disposable_.dispose();
+    }
+
+
 }
