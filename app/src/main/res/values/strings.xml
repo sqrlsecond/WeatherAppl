@@ -1,3 +1,8 @@
 <resources>
     <string name="app_name">WeatherAppl</string>
+    <string name="temperature_text">Temperature: %1$.1f °C</string>
+    <string name="feels_temperature_text">Feels like: %1$.1f °C</string>
+    <string name="condition_text">Condition: %1$s</string>
+    <string name="wind_speed_text">Wind speed: %1$.1f km/h</string>
+    <string name="city_name_text">City…</string>
 </resources>

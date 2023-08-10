@@ -41,6 +41,10 @@ public class Repository implements IRepository {
         return weatherDataFlow_;
     }
 
+    /**
+     * Запрос в сеть
+     * @param cityName - название города
+     */
     @Override
     public void requestWeather(String cityName) {
 
@@ -61,6 +65,15 @@ public class Repository implements IRepository {
         weatherService_.getCurrentWeather(cityName).subscribeOn(Schedulers.io()).subscribe(new DisposableSingleObserver<WeatherResponse>() {
             @Override
             public void onSuccess(WeatherResponse value) {
+                //Сохраняется только результат последнего запроса
+                weatherDao_.clearTable();
+                weatherDao_.insert(new WeatherStorage(
+                    value.getCity(),
+                    value.getTemperature(),
+                    value.getFeelsLikeTemperature(),
+                    value.getWindSpeed(),
+                    value.getCondition()
+                ));
                 weatherDataFlow_.onNext(value.toWeatherDomain());
             }
 
@@ -70,5 +83,23 @@ public class Repository implements IRepository {
             }
         });
 
+    }
+
+    /**
+     * Прочитать данные из локальной БД
+     */
+    @Override
+    public void readWeather() {
+        weatherDao_.getWeather().subscribeOn(Schedulers.io()).subscribe(new DisposableSingleObserver<WeatherStorage>() {
+            @Override
+            public void onSuccess(WeatherStorage value) {
+                weatherDataFlow_.onNext(value.toWeatherDomain());
+            }
+
+            @Override
+            public void onError(Throwable e) {
+                Log.d("WeatResp", e.toString());
+            }
+        });
     }
 }

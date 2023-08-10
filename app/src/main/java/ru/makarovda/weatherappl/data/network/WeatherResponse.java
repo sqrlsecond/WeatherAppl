@@ -6,9 +6,8 @@ import ru.makarovda.weatherappl.domain.WeatherData;
 
 public class WeatherResponse {
 
-    public class Location
+    public static class Location
     {
-
         @SerializedName("name")
         private String name_;
 
@@ -18,9 +17,9 @@ public class WeatherResponse {
         }
     }
 
-    public class Current
+    public static class Current
     {
-        private class Condition
+        private static class Condition
         {
             @SerializedName("text")
             public String text_;
@@ -67,9 +66,10 @@ public class WeatherResponse {
     @SerializedName("location")
     private Location location_;
 
-    public WeatherResponse(Current current)
+    public WeatherResponse(Current current, Location location)
     {
         current_ = current;
+        location_ = location;
     }
 
     public WeatherData toWeatherDomain()
@@ -81,6 +81,31 @@ public class WeatherResponse {
                 current_.condition_.text_,
                 location_.name_
         );
+    }
+
+    public float getTemperature()
+    {
+        return current_.temperature_;
+    }
+
+    public float getFeelsLikeTemperature()
+    {
+        return current_.feelsLikeTemperature_;
+    }
+
+    public float getWindSpeed()
+    {
+        return current_.windSpeed_;
+    }
+
+    public String getCondition()
+    {
+        return current_.condition_.text_;
+    }
+
+    public String getCity()
+    {
+        return location_.name_;
     }
 
 }

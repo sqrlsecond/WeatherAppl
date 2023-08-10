@@ -40,6 +40,14 @@ public class WeatherStorage {
         condition = "";
     }
 
+    public WeatherStorage(@NonNull String city, float temperature, float feelsLikeTemperature, float windSpeed, String condition) {
+        this.city = city;
+        this.temperature = temperature;
+        this.feelsLikeTemperature = feelsLikeTemperature;
+        this.windSpeed = windSpeed;
+        this.condition = condition;
+    }
+
     public WeatherData toWeatherDomain()
     {
         return new WeatherData(

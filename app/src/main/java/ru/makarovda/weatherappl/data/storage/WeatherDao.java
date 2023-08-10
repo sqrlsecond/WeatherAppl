@@ -3,6 +3,7 @@ package ru.makarovda.weatherappl.data.storage;
 import androidx.room.Dao;
 import androidx.room.Delete;
 import androidx.room.Insert;
+import androidx.room.OnConflictStrategy;
 import androidx.room.Query;
 import androidx.room.Update;
 
@@ -20,8 +21,11 @@ public interface WeatherDao {
     @Delete
     void delete(WeatherStorage weatherStorage);
 
-    @Insert
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
     void insert(WeatherStorage weatherStorage);
+
+    @Query("SELECT * FROM weather")
+    Single<WeatherStorage> getWeather();
 
     @Query("DELETE FROM weather")
     void clearTable();
